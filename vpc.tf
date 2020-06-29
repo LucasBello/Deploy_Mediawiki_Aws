@@ -129,11 +129,11 @@ resource "aws_key_pair" "generated_key" {
 
 #Setup das Instancias
 resource "aws_instance" "webserver1" {
-  ami           = "${var.aws_ami}"
-  instance_type = "${var.aws_instance_type}"
-  key_name  = "${aws_key_pair.generated_key.key_name}"
-  vpc_security_group_ids = ["${aws_security_group.mw_sg.id}"]
-  subnet_id     = "${aws_subnet.Producao_subneta.id}" 
+  ami           = var.aws_ami
+  instance_type = var.aws_instance_type
+  key_name  = aws_key_pair.generated_key.key_name
+  vpc_security_group_ids = [aws_security_group.mw_sg.id]
+  subnet_id     = aws_subnet.Producao_subneta.id 
   associate_public_ip_address = true
   tags = {
     Name = lookup(var.aws_tags,"webserver1")
@@ -174,7 +174,7 @@ resource "aws_elb" "mw_elb" {
   subnets         = [aws_subnet.Producao_subneta.id, aws_subnet.Producao_subnetb.id]
   security_groups = [aws_security_group.mw_sg.id]
   instances = [aws_instance.webserver1.id, aws_instance.webserver2.id]
-  listener = {
+  listener {
     instance_port     = 80
     instance_protocol = "http"
     lb_port           = 80
