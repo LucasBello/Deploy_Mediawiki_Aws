@@ -16,7 +16,7 @@ variable "keyname" {
 
 # Red Hat Enterprise Linux 8 (HVM)
 variable "aws_ami" {
-  default= "ami-00e63b4959e1a98b7"
+  default= "ami-098f16afa9edf40be"
 }
 
 # VPC e Subnet
