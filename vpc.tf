@@ -11,7 +11,7 @@ provider "random" {
 
 #Setup da VPC
 resource "aws_vpc" "uol_vpc" {
-  cidr_block = "${var.aws_cidr_vpc}"
+  cidr_block = var.aws_cidr_vpc
   enable_dns_support = true
   enable_dns_hostnames = true
   tags = {
@@ -128,7 +128,7 @@ resource "aws_key_pair" "generated_key" {
 #}
 
 #Setup das Instancias
-resource "aws_instance" "WebServer1" {
+resource "aws_instance" "webserver1" {
   ami           = "${var.aws_ami}"
   instance_type = "${var.aws_instance_type}"
   key_name  = "${aws_key_pair.generated_key.key_name}"
@@ -136,7 +136,7 @@ resource "aws_instance" "WebServer1" {
   subnet_id     = "${aws_subnet.Producao_subneta.id}" 
   associate_public_ip_address = true
   tags = {
-    Name = lookup(var.aws_tags,"WebServer1")
+    Name = lookup(var.aws_tags,"webserver1")
     group = "web"
   }
 }
