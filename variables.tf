@@ -41,7 +41,7 @@ variable "aws_sg" {
 }
 
 variable "aws_tags" {
-  type = "map"
+  #type = "map"
   default = {
     "webserver1" = "UOLWIKI01"
 	  "webserver2" = "UOLWIKI01"
