@@ -93,39 +93,26 @@ resource "aws_key_pair" "generated_key" {
 }
 
 
-#####Gateway para internet
-#resource "aws_internet_gateway" "pd_igw" {
-#    vpc_id = "${aws_vpc.uol_vpc.id}"
-#    tags {
-#        Name = "Gateway para internet"
-#    }
-#}
+#Gateway para internet
+resource "aws_internet_gateway" "pd_igw" {
+    vpc_id = aws_vpc.uol_vpc.id
+    tags {
+        Name = "Gateway para internet"
+    }
+}
 
-#####Tabela da rota de acesso a internet
-#resource "aws_route_table" "pd_rt" {
-#  vpc_id = "${aws_vpc.uol_vpc.id}"
-#  route {
-#        cidr_block = "0.0.0.0/0"
-#        gateway_id = "${aws_internet_gateway.pd_igw.id}"
-#    }
-#}
-#resource "aws_route_table_association" "Producao_Internet" {
-#    subnet_id = "${aws_subnet.Producao_subneta.id}"
-#    route_table_id = "${aws_route_table.pd_rt.id}"
-#}
-
-#####NAT
-#resource "aws_eip" "nat" {
-#}
-#
-#resource "aws_nat_gateway" "main-natgw" {
-#  allocation_id = "${aws_eip.nat.id}"
-#  subnet_id     = "${aws_subnet.Producao_subneta.id}"
-#
-#  tags {
-#   Name = "main-nat"
-#  }
-#}
+#Tabela da rota de acesso a internet
+resource "aws_route_table" "pd_rt" {
+  vpc_id = aws_vpc.uol_vpc.id
+  route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.pd_igw.id
+    }
+}
+resource "aws_route_table_association" "Producao_Internet" {
+    subnet_id = aws_subnet.Producao_subneta.id
+    route_table_id = aws_route_table.pd_rt.id
+}
 
 #Setup das Instancias
 resource "aws_instance" "webserver1" {
