@@ -96,7 +96,7 @@ resource "aws_key_pair" "generated_key" {
 #Gateway para internet
 resource "aws_internet_gateway" "pd_igw" {
     vpc_id = aws_vpc.uol_vpc.id
-    tags {
+    tags = {
         Name = "Gateway para internet"
     }
 }
