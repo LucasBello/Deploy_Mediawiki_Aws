@@ -14,9 +14,9 @@ variable "keyname" {
   default = "mediawiki"
 }
 
-# RHEL 7.5
+# Red Hat Enterprise Linux 8 (HVM)
 variable "aws_ami" {
-  default= "ami-28e07e50"
+  default= "ami-00e63b4959e1a98b7"
 }
 
 # VPC e Subnet
