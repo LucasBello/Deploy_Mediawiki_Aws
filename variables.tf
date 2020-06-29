@@ -1,13 +1,13 @@
 #Região
 variable "aws_region" {
 
-  default =  "sa-east-1" #São Paulo
+  default =  "us-east-1" #São Paulo
 }
 
  # Zonas de Disponibilidade 
 variable "zonadisp" {
-  type = "list"
-  default = ["sa-east-1a", "sa-east-1b", "sa-east-1c"] #Indice inicia em 0
+  #type = "list"
+  default = ["us-east-1a", "us-east-1b", "us-east-1c"] #Indice inicia em 0
 }
 
 variable "keyname" {
