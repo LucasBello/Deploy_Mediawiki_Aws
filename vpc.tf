@@ -10,7 +10,7 @@ resource "aws_vpc" "uol_vpc" {
   cidr_block = "${var.aws_cidr_vpc}"
   enable_dns_support = true
   enable_dns_hostnames = true
-  tags {
+  tags = {
     Name = "UOLAWSVPC"
   }
 }
@@ -31,7 +31,7 @@ resource "aws_subnet" "Producao_subnetb" {
   cidr_block = "${var.aws_cidr_subnet2}"
   availability_zone = "${element(var.zonadisp, 1)}"
 
-  tags {
+  tags = {
     Name = "sub_Producao_b"
   }
 }
@@ -42,7 +42,7 @@ resource "aws_subnet" "DB_Producao_subnet" {
   cidr_block = "${var.aws_cidr_subnet3}"
   availability_zone = "${element(var.zonadisp, 2)}"
 
-  tags {
+  tags = {
     Name = "sub_DB_Producao"
   }
 }
@@ -131,7 +131,7 @@ resource "aws_instance" "WebServer1" {
   vpc_security_group_ids = ["${aws_security_group.mw_sg.id}"]
   subnet_id     = "${aws_subnet.Producao_subneta.id}" 
   associate_public_ip_address = true
-  tags {
+  tags = {
     Name = "${lookup(var.aws_tags,"WebServer1")}"
     group = "web"
   }
@@ -145,7 +145,7 @@ resource "aws_instance" "webserver2" {
   vpc_security_group_ids = ["${aws_security_group.mw_sg.id}"]
   subnet_id     = "${aws_subnet.Producao_subnetb.id}" 
   associate_public_ip_address = true
-  tags {
+  tags = {
     Name = "${lookup(var.aws_tags,"webserver2")}"
     group = "web"
   }
@@ -159,7 +159,7 @@ resource "aws_instance" "dbserver" {
   vpc_security_group_ids = ["${aws_security_group.mw_sg.id}"]
   subnet_id     = "${aws_subnet.DB_Producao_subnet.id}"
 
-  tags {
+  tags = {
     Name = "${lookup(var.aws_tags,"dbserver")}"
     group = "db"
   }
@@ -170,7 +170,7 @@ resource "aws_elb" "mw_elb" {
   subnets         = ["${aws_subnet.Producao_subneta.id}", "${aws_subnet.Producao_subnetb.id}"]
   security_groups = ["${aws_security_group.mw_sg.id}"]
   instances = ["${aws_instance.webserver1.id}", "${aws_instance.webserver2.id}"]
-  listener {
+  listener = {
     instance_port     = 80
     instance_protocol = "http"
     lb_port           = 80
