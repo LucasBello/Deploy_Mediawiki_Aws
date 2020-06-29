@@ -2,7 +2,11 @@
 provider "aws" {
   version = "2.33.0"
 
-  region = var.region
+  region = var.aws_region
+}
+
+provider "random" {
+  version = "2.2"
 }
 
 #Setup da VPC
@@ -16,20 +20,20 @@ resource "aws_vpc" "uol_vpc" {
 }
 #Subnet Producao_a - sa-east-1a
 resource "aws_subnet" "Producao_subneta" {
-  vpc_id = "${aws_vpc.uol_vpc.id}"
-  cidr_block = "${var.aws_cidr_subnet1}"
-  availability_zone = "${element(var.zonadisp, 0)}"
+  vpc_id = aws_vpc.uol_vpc.id
+  cidr_block = var.aws_cidr_subnet1
+  availability_zone = element(var.zonadisp, 0)
 
-  tags {
+  tags = {
     Name = "sub_Producao_a"
   }
 }
 
 #Subnet Producao_b - sa-east-1b
 resource "aws_subnet" "Producao_subnetb" {
-  vpc_id = "${aws_vpc.uol_vpc.id}"
-  cidr_block = "${var.aws_cidr_subnet2}"
-  availability_zone = "${element(var.zonadisp, 1)}"
+  vpc_id = aws_vpc.uol_vpc.id
+  cidr_block = var.aws_cidr_subnet2
+  availability_zone = element(var.zonadisp, 1)
 
   tags = {
     Name = "sub_Producao_b"
@@ -38,9 +42,9 @@ resource "aws_subnet" "Producao_subnetb" {
 
 #Subnet Producao_c - sa-east-1c
 resource "aws_subnet" "DB_Producao_subnet" {
-  vpc_id = "${aws_vpc.uol_vpc.id}"
-  cidr_block = "${var.aws_cidr_subnet3}"
-  availability_zone = "${element(var.zonadisp, 2)}"
+  vpc_id = aws_vpc.uol_vpc.id
+  cidr_block = var.aws_cidr_subnet3
+  availability_zone = element(var.zonadisp, 2)
 
   tags = {
     Name = "sub_DB_Producao"
@@ -50,7 +54,7 @@ resource "aws_subnet" "DB_Producao_subnet" {
 #NACL - TCP 80, 3306 e 22
 resource "aws_security_group" "mw_sg" {
   name = "mw_sg"
-  vpc_id = "${aws_vpc.uol_vpc.id}"
+  vpc_id = aws_vpc.uol_vpc.id
   ingress {
     from_port = 22 
     to_port  = 22
@@ -84,8 +88,8 @@ resource "tls_private_key" "mw_key" {
   rsa_bits  = 2048
 }
 resource "aws_key_pair" "generated_key" {
-  key_name   = "${var.keyname}"
-  public_key = "${tls_private_key.mw_key.public_key_openssh}"
+  key_name   = var.keyname
+  public_key = tls_private_key.mw_key.public_key_openssh
 }
 
 
@@ -132,44 +136,44 @@ resource "aws_instance" "WebServer1" {
   subnet_id     = "${aws_subnet.Producao_subneta.id}" 
   associate_public_ip_address = true
   tags = {
-    Name = "${lookup(var.aws_tags,"WebServer1")}"
+    Name = lookup(var.aws_tags,"WebServer1")
     group = "web"
   }
 }
 
 resource "aws_instance" "webserver2" {
   #depends_on = ["${aws_security_group.mw_sg}"]
-  ami           = "${var.aws_ami}"
-  instance_type = "${var.aws_instance_type}"
-  key_name  = "${aws_key_pair.generated_key.key_name}"
-  vpc_security_group_ids = ["${aws_security_group.mw_sg.id}"]
-  subnet_id     = "${aws_subnet.Producao_subnetb.id}" 
+  ami           = var.aws_ami
+  instance_type = var.aws_instance_type
+  key_name  = aws_key_pair.generated_key.key_name
+  vpc_security_group_ids = [aws_security_group.mw_sg.id]
+  subnet_id     = aws_subnet.Producao_subnetb.id
   associate_public_ip_address = true
   tags = {
-    Name = "${lookup(var.aws_tags,"webserver2")}"
+    Name = lookup(var.aws_tags,"webserver2")
     group = "web"
   }
 }
 
 resource "aws_instance" "dbserver" {
   #depends_on = ["${aws_security_group.mw_sg}"]
-  ami           = "${var.aws_ami}"
-  instance_type = "${var.aws_instance_type}"
-  key_name  = "${aws_key_pair.generated_key.key_name}" 
-  vpc_security_group_ids = ["${aws_security_group.mw_sg.id}"]
-  subnet_id     = "${aws_subnet.DB_Producao_subnet.id}"
+  ami           = var.aws_ami
+  instance_type = var.aws_instance_type
+  key_name  = aws_key_pair.generated_key.key_name 
+  vpc_security_group_ids = [aws_security_group.mw_sg.id]
+  subnet_id     = aws_subnet.DB_Producao_subnet.id
 
   tags = {
-    Name = "${lookup(var.aws_tags,"dbserver")}"
+    Name = lookup(var.aws_tags,"dbserver")
     group = "db"
   }
 }
 
 resource "aws_elb" "mw_elb" {
   name = "MediaWikiELB"
-  subnets         = ["${aws_subnet.Producao_subneta.id}", "${aws_subnet.Producao_subnetb.id}"]
-  security_groups = ["${aws_security_group.mw_sg.id}"]
-  instances = ["${aws_instance.webserver1.id}", "${aws_instance.webserver2.id}"]
+  subnets         = [aws_subnet.Producao_subneta.id, aws_subnet.Producao_subnetb.id]
+  security_groups = [aws_security_group.mw_sg.id]
+  instances = [aws_instance.webserver1.id, aws_instance.webserver2.id]
   listener = {
     instance_port     = 80
     instance_protocol = "http"
@@ -179,9 +183,9 @@ resource "aws_elb" "mw_elb" {
 }
 
 output "pem" {
-        value = ["${tls_private_key.mw_key.private_key_pem}"]
+        value = [tls_private_key.mw_key.private_key_pem]
 }
 
 output "address" {
-  value = "${aws_elb.mw_elb.dns_name}"
+  value = aws_elb.mw_elb.dns_name
 }
