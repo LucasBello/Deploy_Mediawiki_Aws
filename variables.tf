@@ -11,7 +11,7 @@ variable "zonadisp" {
 }
 
 variable "keyname" {
-  default = "mediawiki"
+  default = "mediawiki_key"
 }
 
 # Red Hat Enterprise Linux 8 (HVM)
