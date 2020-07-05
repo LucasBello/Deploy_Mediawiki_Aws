@@ -1,26 +1,32 @@
-#As variaveis já estão no Terraform
-provider "aws" {
-  version = "2.33.0"
+#As variaveis já estão no Terraform Cloud
+#Se for deploy manual tem que fazer o EXPORT
 
+provider "aws" {
   region = var.aws_region
 }
 
-provider "random" {
-  version = "2.2"
-}
-
 #Setup da VPC
-resource "aws_vpc" "uol_vpc" {
+resource "aws_vpc" "vinnland_vpc" {
   cidr_block = var.aws_cidr_vpc
-  enable_dns_support = true
-  enable_dns_hostnames = true
+  #enable_dns_support = true #Default=true
+  #enable_dns_hostnames = true #Default=false
   tags = {
-    Name = "UOLAWSVPC"
+    Name = "VINAWSVPC"
   }
 }
-#Subnet Producao_a - sa-east-1a
+
+#Gateway para internet
+resource "aws_internet_gateway" "wiki_igw" {
+    vpc_id = aws_vpc.vin_vpc.id
+    tags = {
+        Name = "Gateway para internet"
+    }
+}
+
+
+#Subnet Producao_a - us-west-2a
 resource "aws_subnet" "Producao_subneta" {
-  vpc_id = aws_vpc.uol_vpc.id
+  vpc_id = aws_vpc.vin_vpc.id
   cidr_block = var.aws_cidr_subnet1
   availability_zone = element(var.zonadisp, 0)
 
@@ -31,7 +37,7 @@ resource "aws_subnet" "Producao_subneta" {
 
 #Subnet Producao_b - sa-east-1b
 resource "aws_subnet" "Producao_subnetb" {
-  vpc_id = aws_vpc.uol_vpc.id
+  vpc_id = aws_vpc.vin_vpc.id
   cidr_block = var.aws_cidr_subnet2
   availability_zone = element(var.zonadisp, 1)
 
@@ -42,7 +48,7 @@ resource "aws_subnet" "Producao_subnetb" {
 
 #Subnet Producao_c - sa-east-1c
 resource "aws_subnet" "DB_Producao_subnet" {
-  vpc_id = aws_vpc.uol_vpc.id
+  vpc_id = aws_vpc.vin_vpc.id
   cidr_block = var.aws_cidr_subnet3
   availability_zone = element(var.zonadisp, 2)
 
@@ -51,36 +57,112 @@ resource "aws_subnet" "DB_Producao_subnet" {
   }
 }
 
-#NACL - TCP 80, 3306 e 22
+#Tabela da rota de acesso a internet
+resource "aws_route_table" "mw_rt" {
+  vpc_id = aws_vpc.vin_vpc.id
+
+  route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.pd_igw.id
+    }
+
+    tags = {
+      Name = "Rota MediaWiki"
+    }
+}
+
+
+#resource "aws_route_table_association" "Producao_Internet" {
+#    subnet_id = aws_subnet.Producao_subneta.id
+#    route_table_id = aws_route_table.pd_rt.id
+#}
+
+
+
+#ACL - REDE INTERNA
+resource "aws_network_acl" "webserver" {
+  vpc_id = aws_vpc.vin_vpc.id
+
+  egress {
+    protocol = "-1"
+    rule_no = 200
+    action = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port = 0
+    to_port = 0
+  }
+    ingress {
+    protocol   = "-1"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
+  }
+
+
+
+#Abrir portas de aplicação
 resource "aws_security_group" "mw_sg" {
   name = "mw_sg"
-  vpc_id = aws_vpc.uol_vpc.id
+  description = "HTTP, SSH e BANCO"
+  vpc_id = aws_vpc.vin_vpc.id
+#Liberar porta 80
+ ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+#Liberar porta 22
   ingress {
-    from_port = 22 
-    to_port  = 22
-    protocol = "TCP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-   ingress {
-    from_port = 80
-    to_port  = 80
-    protocol = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+#Liberar porta 3306
   ingress {
     from_port = 3306
-    to_port  = 3306
-    protocol = "TCP"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  egress {
-    from_port = "0"
-    to_port  = "0"
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    to_port = 3306
+    protocol = "tcp"
+    cidr_block = ["0.0.0.0/0"]
 
   }
+#Saida
+  egress {
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks     = ["0.0.0.0/0"]
+  }
 }
+
+#Elastic Load Balancer
+resource "aws_eip" "mw_alb" {
+  name = "MediaWikiELB"
+  instance = [aws_instance.webserver1.id, aws_instance.webserver2.id]
+  vpc      = true
+  depends_on = ["aws_internet_gateway.wiki_igw"]
+}
+
+
+#resource "aws_elb" "mw_elb" {
+  #name = "MediaWikiELB"
+  #subnets         = [aws_subnet.Producao_subneta.id, aws_subnet.Producao_subnetb.id]
+  #security_groups = [aws_security_group.mw_sg.id]
+  #instances = [aws_instance.webserver1.id, aws_instance.webserver2.id]
+  #listener {
+  #  instance_port     = 80
+  #  instance_protocol = "http"
+  #  lb_port           = 80
+  #  lb_protocol       = "http"
+  #}
+#}
+
+
+
 
 #Gerando Key Privada
 resource "tls_private_key" "mw_key" {
@@ -92,36 +174,20 @@ resource "aws_key_pair" "generated_key" {
   public_key = tls_private_key.mw_key.public_key_openssh
 }
 
-
-#Gateway para internet
-resource "aws_internet_gateway" "pd_igw" {
-    vpc_id = aws_vpc.uol_vpc.id
-    tags = {
-        Name = "Gateway para internet"
-    }
-}
-
-#Tabela da rota de acesso a internet
-resource "aws_route_table" "pd_rt" {
-  vpc_id = aws_vpc.uol_vpc.id
-  route {
-        cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internet_gateway.pd_igw.id
-    }
-}
-resource "aws_route_table_association" "Producao_Internet" {
-    subnet_id = aws_subnet.Producao_subneta.id
-    route_table_id = aws_route_table.pd_rt.id
-}
-
 #Setup das Instancias
 resource "aws_instance" "webserver1" {
   ami           = var.aws_ami
+  availability_zone = element(var.zonadisp, 0)
   instance_type = var.aws_instance_type
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.Producao_subneta.id 
   associate_public_ip_address = true
+
+  root_block_device {
+  volume_size = 50
+  }
+
   tags = {
     Name = lookup(var.aws_tags,"webserver1")
     group = "web"
@@ -129,13 +195,18 @@ resource "aws_instance" "webserver1" {
 }
 
 resource "aws_instance" "webserver2" {
-  #depends_on = ["${aws_security_group.mw_sg}"]
   ami           = var.aws_ami
+  availability_zone = element(var.zonadisp, 1)
   instance_type = var.aws_instance_type
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.Producao_subnetb.id
   associate_public_ip_address = true
+
+  root_block_device {
+  volume_size = 50
+  }
+
   tags = {
     Name = lookup(var.aws_tags,"webserver2")
     group = "web"
@@ -143,12 +214,16 @@ resource "aws_instance" "webserver2" {
 }
 
 resource "aws_instance" "dbserver" {
-  #depends_on = ["${aws_security_group.mw_sg}"]
   ami           = var.aws_ami
+  availability_zone = element(var.zonadisp, 2)
   instance_type = var.aws_instance_type
   key_name  = aws_key_pair.generated_key.key_name 
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.DB_Producao_subnet.id
+  
+  root_block_device {
+  volume_size = 50
+  }
 
   tags = {
     Name = lookup(var.aws_tags,"dbserver")
@@ -156,18 +231,6 @@ resource "aws_instance" "dbserver" {
   }
 }
 
-resource "aws_elb" "mw_elb" {
-  name = "MediaWikiELB"
-  subnets         = [aws_subnet.Producao_subneta.id, aws_subnet.Producao_subnetb.id]
-  security_groups = [aws_security_group.mw_sg.id]
-  instances = [aws_instance.webserver1.id, aws_instance.webserver2.id]
-  listener {
-    instance_port     = 80
-    instance_protocol = "http"
-    lb_port           = 80
-    lb_protocol       = "http"
-  }
-}
 
 output "pem" {
         value = [tls_private_key.mw_key.private_key_pem]
@@ -175,4 +238,8 @@ output "pem" {
 
 output "address" {
   value = aws_elb.mw_elb.dns_name
+}
+
+output "instance_ip_addr" {
+  value = aws_eip.mw_alb.public_ip
 }
