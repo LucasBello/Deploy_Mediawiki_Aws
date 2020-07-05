@@ -140,7 +140,7 @@ resource "aws_security_group" "mw_sg" {
 }
 
 #Elastic Load Balancer
-resource "aws_elb" "mw_elb" {
+resource "aws_eip" "mw_elb" {
   name = "MediaWikiELB"
   instance = [aws_instance.webserver1.id, aws_instance.webserver2.id]
   vpc      = true
@@ -237,7 +237,7 @@ output "pem" {
 }
 
 output "address" {
-  value = aws_elb.mw_elb.dns_name
+  value = aws_eip.mw_elb.dns_name
 }
 
 output "instance_ip_addr" {
