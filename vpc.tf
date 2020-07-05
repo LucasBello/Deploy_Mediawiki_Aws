@@ -82,7 +82,10 @@ resource "aws_route_table_association" "Producao_Internetb" {
     route_table_id = aws_route_table.mw_rt.id
 }
 
-
+resource "aws_route_table_association" "Producao_Internetb" {
+    subnet_id = aws_subnet.DB_Producao_subnet.id
+    route_table_id = aws_route_table.mw_rt.id
+}
 
 #ACL - REDE INTERNA
 #resource "aws_network_acl" "webserver" {
