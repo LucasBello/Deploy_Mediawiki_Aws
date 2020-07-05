@@ -72,10 +72,10 @@ resource "aws_route_table" "mw_rt" {
 }
 
 
-#resource "aws_route_table_association" "Producao_Internet" {
-#    subnet_id = aws_subnet.Producao_subneta.id
-#    route_table_id = aws_route_table.pd_rt.id
-#}
+resource "aws_route_table_association" "Producao_Internet" {
+    subnet_id = aws_subnet.Producao_subneta.id
+    route_table_id = aws_route_table.mw_rt.id
+}
 
 
 
@@ -111,7 +111,7 @@ resource "aws_security_group" "mw_sg" {
  ingress {
     from_port   = 80
     to_port     = 80
-    protocol    = "tcp"
+    protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -119,14 +119,14 @@ resource "aws_security_group" "mw_sg" {
   ingress {
     from_port   = 22
     to_port     = 22
-    protocol    = "tcp"
+    protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
 #Liberar porta 3306
   ingress {
     from_port = 3306
     to_port = 3306
-    protocol = "tcp"
+    protocol = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
 
   }
