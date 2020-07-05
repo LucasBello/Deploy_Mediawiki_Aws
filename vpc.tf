@@ -17,7 +17,7 @@ resource "aws_vpc" "vinnland_vpc" {
 
 #Gateway para internet
 resource "aws_internet_gateway" "wiki_igw" {
-    vpc_id = aws_vpc.vin_vpc.id
+    vpc_id = aws_vpc.vinnland_vpc.id
     tags = {
         Name = "Gateway para internet"
     }
@@ -26,7 +26,7 @@ resource "aws_internet_gateway" "wiki_igw" {
 
 #Subnet Producao_a - us-west-2a
 resource "aws_subnet" "Producao_subneta" {
-  vpc_id = aws_vpc.vin_vpc.id
+  vpc_id = aws_vpc.vinnland_vpc.id
   cidr_block = var.aws_cidr_subnet1
   availability_zone = element(var.zonadisp, 0)
 
@@ -37,7 +37,7 @@ resource "aws_subnet" "Producao_subneta" {
 
 #Subnet Producao_b - sa-east-1b
 resource "aws_subnet" "Producao_subnetb" {
-  vpc_id = aws_vpc.vin_vpc.id
+  vpc_id = aws_vpc.vinnland_vpc.id
   cidr_block = var.aws_cidr_subnet2
   availability_zone = element(var.zonadisp, 1)
 
@@ -48,7 +48,7 @@ resource "aws_subnet" "Producao_subnetb" {
 
 #Subnet Producao_c - sa-east-1c
 resource "aws_subnet" "DB_Producao_subnet" {
-  vpc_id = aws_vpc.vin_vpc.id
+  vpc_id = aws_vpc.vinnland_vpc.id
   cidr_block = var.aws_cidr_subnet3
   availability_zone = element(var.zonadisp, 2)
 
@@ -59,7 +59,7 @@ resource "aws_subnet" "DB_Producao_subnet" {
 
 #Tabela da rota de acesso a internet
 resource "aws_route_table" "mw_rt" {
-  vpc_id = aws_vpc.vin_vpc.id
+  vpc_id = aws_vpc.vinnland_vpc.id
 
   route {
         cidr_block = "0.0.0.0/0"
@@ -81,7 +81,7 @@ resource "aws_route_table" "mw_rt" {
 
 #ACL - REDE INTERNA
 resource "aws_network_acl" "webserver" {
-  vpc_id = aws_vpc.vin_vpc.id
+  vpc_id = aws_vpc.vinnland_vpc.id
 
   egress {
     protocol = "-1"
@@ -106,7 +106,7 @@ resource "aws_network_acl" "webserver" {
 resource "aws_security_group" "mw_sg" {
   name = "mw_sg"
   description = "HTTP, SSH e BANCO"
-  vpc_id = aws_vpc.vin_vpc.id
+  vpc_id = aws_vpc.vinnland_vpc.id
 #Liberar porta 80
  ingress {
     from_port   = 80
@@ -144,7 +144,7 @@ resource "aws_eip" "mw_elb" {
   name = "MediaWikiELB"
   instance = [aws_instance.webserver1.id, aws_instance.webserver2.id]
   vpc      = true
-  depends_on = ["aws_internet_gateway.wiki_igw"]
+  depends_on = "aws_internet_gateway.wiki_igw"
 }
 
 
