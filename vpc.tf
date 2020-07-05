@@ -140,7 +140,7 @@ resource "aws_security_group" "mw_sg" {
 }
 
 #Elastic Load Balancer
-resource "aws_e" "mw_elb" {
+resource "aws_eip" "mw_eip" {
     instance = [aws_instance.webserver1.id, aws_instance.webserver2.id]
   vpc      = true
   depends_on = ["aws_internet_gateway.wiki_igw"]
@@ -240,5 +240,5 @@ output "address" {
 }
 
 output "instance_ip_addr" {
-  value = aws_eip.mw_elb.public_ip
+  value = aws_eip.mw_eip.public_ip
 }
