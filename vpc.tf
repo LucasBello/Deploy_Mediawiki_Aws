@@ -80,26 +80,26 @@ resource "aws_route_table" "mw_rt" {
 
 
 #ACL - REDE INTERNA
-resource "aws_network_acl" "webserver" {
-  vpc_id = aws_vpc.vinnland_vpc.id
+#resource "aws_network_acl" "webserver" {
+#  vpc_id = aws_vpc.vinnland_vpc.id
 
-  egress {
-    protocol = "-1"
-    rule_no = 200
-    action = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port = 0
-    to_port = 0
-  }
-    ingress {
-    protocol   = "-1"
-    rule_no    = 100
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 0
-    to_port    = 0
-  }
-}
+#  egress {
+#    protocol = "-1"
+#    rule_no = 200
+#    action = "allow"
+#    cidr_block = "0.0.0.0/0"
+#    from_port = 0
+#    to_port = 0
+#  }
+#    ingress {
+#    protocol   = "-1"
+#    rule_no    = 100
+#    action     = "allow"
+#    cidr_block = "0.0.0.0/0"
+#    from_port  = 0
+#    to_port    = 0
+#  }
+#}
 
 
 #Abrir portas de aplicação
@@ -140,23 +140,23 @@ resource "aws_security_group" "mw_sg" {
 }
 
 #Elastic Load Balancer
-resource "aws_eip" "mw_eip_01" {
-    instance = aws_instance.webserver1.id
+resource "aws_eip" "grafana" {
+    instance = aws_instance.webserver3.id
   vpc      = true
   depends_on = ["aws_internet_gateway.wiki_igw"]
 }
 
-resource "aws_eip" "mw_eip_02" {
-    instance = aws_instance.webserver2.id
-  vpc      = true
-  depends_on = ["aws_internet_gateway.wiki_igw"]
-}
+#resource "aws_eip" "mw_eip_02" {
+#    instance = aws_instance.webserver2.id
+#  vpc      = true
+#  depends_on = ["aws_internet_gateway.wiki_igw"]
+#}
 
-resource "aws_eip" "mw_eip_db" {
-    instance = aws_instance.dbserver.id
-  vpc      = true
-  depends_on = ["aws_internet_gateway.wiki_igw"]
-}
+#resource "aws_eip" "mw_eip_db" {
+#    instance = aws_instance.dbserver.id
+#  vpc      = true
+#  depends_on = ["aws_internet_gateway.wiki_igw"]
+#}
 
 
 resource "aws_elb" "mw_elb" {
@@ -224,6 +224,25 @@ resource "aws_instance" "webserver2" {
   }
 }
 
+resource "aws_instance" "webserver3" {
+  ami           = var.aws_ami
+  availability_zone = element(var.zonadisp, 0)
+  instance_type = var.aws_instance_type
+  key_name  = aws_key_pair.generated_key.key_name
+  vpc_security_group_ids = [aws_security_group.mw_sg.id]
+  subnet_id     = aws_subnet.Producao_subnetb.id
+  associate_public_ip_address = true
+
+  root_block_device {
+  volume_size = 50
+  }
+
+  tags = {
+    Name = lookup(var.aws_tags,"webserver3")
+    group = "web"
+  }
+}
+
 resource "aws_instance" "dbserver" {
   ami           = var.aws_ami
   availability_zone = element(var.zonadisp, 2)
@@ -251,14 +270,5 @@ output "address" {
   value = aws_elb.mw_elb.dns_name
 }
 
-output "instance_ip_addr_01" {
-  value = aws_eip.mw_eip_01.public_ip
-}
-
-output "instance_ip_addr_02" {
-  value = aws_eip.mw_eip_02.public_ip
-}
-
-output "instance_ip_addr_db" {
-  value = aws_eip.mw_eip_db.public_ip
-}
+output "Graphana" {
+  value = aws_eip.grafana.public_ip

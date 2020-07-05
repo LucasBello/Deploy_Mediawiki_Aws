@@ -38,6 +38,7 @@ variable "aws_tags" {
   default = {
     "webserver1" = "MEDIAWIKI01"
 	  "webserver2" = "MEDIAWIKI02"
+    "webserver3" = "GRAFANA"
     "dbserver"   = "SQLPROD01" 
   }
 }
