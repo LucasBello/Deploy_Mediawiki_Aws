@@ -144,7 +144,7 @@ resource "aws_eip" "mw_elb" {
   name = "MediaWikiELB"
   instance = [aws_instance.webserver1.id, aws_instance.webserver2.id]
   vpc      = true
-  depends_on = "aws_internet_gateway.wiki_igw"
+  depends_on = ["aws_internet_gateway.wiki_igw"]
 }
 
 
