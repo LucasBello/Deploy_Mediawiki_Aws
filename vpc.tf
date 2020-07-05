@@ -140,9 +140,8 @@ resource "aws_security_group" "mw_sg" {
 }
 
 #Elastic Load Balancer
-resource "aws_eip" "mw_eip_02" {
+resource "aws_eip" "mw_eip_01" {
     instance = aws_instance.webserver1.id
-    instance = aws_instance.webserver2.id
   vpc      = true
   depends_on = ["aws_internet_gateway.wiki_igw"]
 }
