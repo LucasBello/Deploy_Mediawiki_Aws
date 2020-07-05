@@ -63,7 +63,7 @@ resource "aws_route_table" "mw_rt" {
 
   route {
         cidr_block = "0.0.0.0/0"
-        gateway_id = aws_internet_gateway.pd_igw.id
+        gateway_id = aws_internet_gateway.wiki_igw.id
     }
 
     tags = {
@@ -127,7 +127,7 @@ resource "aws_security_group" "mw_sg" {
     from_port = 3306
     to_port = 3306
     protocol = "tcp"
-    cidr_block = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"]
 
   }
 #Saida
@@ -140,7 +140,7 @@ resource "aws_security_group" "mw_sg" {
 }
 
 #Elastic Load Balancer
-resource "aws_eip" "mw_elb" {
+resource "aws_elb" "mw_elb" {
   name = "MediaWikiELB"
   instance = [aws_instance.webserver1.id, aws_instance.webserver2.id]
   vpc      = true
