@@ -230,7 +230,7 @@ resource "aws_instance" "webserver3" {
   instance_type = var.aws_instance_type
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
-  subnet_id     = aws_subnet.Producao_subnetb.id
+  subnet_id     = aws_subnet.Producao_subneta.id
   associate_public_ip_address = true
 
   root_block_device {
