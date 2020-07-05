@@ -140,9 +140,21 @@ resource "aws_security_group" "mw_sg" {
 }
 
 #Elastic Load Balancer
-resource "aws_eip" "mw_eip" {
+resource "aws_eip" "mw_eip_02" {
     instance = aws_instance.webserver1.id
     instance = aws_instance.webserver2.id
+  vpc      = true
+  depends_on = ["aws_internet_gateway.wiki_igw"]
+}
+
+resource "aws_eip" "mw_eip_02" {
+    instance = aws_instance.webserver2.id
+  vpc      = true
+  depends_on = ["aws_internet_gateway.wiki_igw"]
+}
+
+resource "aws_eip" "mw_eip_db" {
+    instance = aws_instance.dbserver.id
   vpc      = true
   depends_on = ["aws_internet_gateway.wiki_igw"]
 }
@@ -240,6 +252,14 @@ output "address" {
   value = aws_elb.mw_elb.dns_name
 }
 
-output "instance_ip_addr" {
-  value = aws_eip.mw_eip.public_ip
+output "instance_ip_addr_01" {
+  value = aws_eip.mw_eip_01.public_ip
+}
+
+output "instance_ip_addr_02" {
+  value = aws_eip.mw_eip_02.public_ip
+}
+
+output "instance_ip_addr_db" {
+  value = aws_eip.mw_eip_db.public_ip
 }
