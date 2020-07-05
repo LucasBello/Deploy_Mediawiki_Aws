@@ -99,7 +99,7 @@ resource "aws_network_acl" "webserver" {
     from_port  = 0
     to_port    = 0
   }
-
+}
 
 
 #Abrir portas de aplicação
