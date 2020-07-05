@@ -140,26 +140,25 @@ resource "aws_security_group" "mw_sg" {
 }
 
 #Elastic Load Balancer
-resource "aws_eip" "mw_elb" {
-  name = "MediaWikiELB"
-  instance = [aws_instance.webserver1.id, aws_instance.webserver2.id]
+resource "aws_e" "mw_elb" {
+    instance = [aws_instance.webserver1.id, aws_instance.webserver2.id]
   vpc      = true
   depends_on = ["aws_internet_gateway.wiki_igw"]
 }
 
 
-#resource "aws_elb" "mw_elb" {
-  #name = "MediaWikiELB"
-  #subnets         = [aws_subnet.Producao_subneta.id, aws_subnet.Producao_subnetb.id]
-  #security_groups = [aws_security_group.mw_sg.id]
-  #instances = [aws_instance.webserver1.id, aws_instance.webserver2.id]
-  #listener {
-  #  instance_port     = 80
-  #  instance_protocol = "http"
-  #  lb_port           = 80
-  #  lb_protocol       = "http"
-  #}
-#}
+resource "aws_elb" "mw_elb" {
+  name = "MediaWikiELB"
+  subnets         = [aws_subnet.Producao_subneta.id, aws_subnet.Producao_subnetb.id]
+  security_groups = [aws_security_group.mw_sg.id]
+  instances = [aws_instance.webserver1.id, aws_instance.webserver2.id]
+  listener {
+    instance_port     = 80
+    instance_protocol = "http"
+    lb_port           = 80
+    lb_protocol       = "http"
+  }
+}
 
 
 
@@ -237,7 +236,7 @@ output "pem" {
 }
 
 output "address" {
-  value = aws_eip.mw_elb.dns_name
+  value = aws_elb.mw_elb.dns_name
 }
 
 output "instance_ip_addr" {
