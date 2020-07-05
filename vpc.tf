@@ -270,5 +270,6 @@ output "address" {
   value = aws_elb.mw_elb.dns_name
 }
 
-output "Graphana" {
+output "Grafana" {
   value = aws_eip.grafana.public_ip
+}
