@@ -1,11 +1,11 @@
 #Região
 variable "aws_region" {
-  default =  "us-east-1"
+  default =  "us-west-2"
 }
 
  #Zonas de Disponibilidade 
 variable "zonadisp" {
-  default = ["us-east-1a", "us-east-1b", "us-east-1c"] #Indice inicia em 0
+  default = ["us-west-2a", "us-west-2b", "us-west-2c"] #Indice inicia em 0
 }
 
 #VPC
@@ -51,7 +51,8 @@ variable "keyname" {
 #Red Hat Enterprise Linux 8 (HVM) para região us-west-2.
 #Verificar ami para outras regiões
 variable "aws_ami" {
-  default= "ami-098f16afa9edf40be"
+  #default= "ami-098f16afa9edf40be"
+  default= "ami-28e07e50"
 }
 
 variable "aws_instance_type" {
