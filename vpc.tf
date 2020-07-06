@@ -160,11 +160,11 @@ resource "aws_eip" "grafana" {
 #  depends_on = ["aws_internet_gateway.wiki_igw"]
 #}
 
-#resource "aws_eip" "mw_eip_db" {
-#    instance = aws_instance.dbserver.id
-#  vpc      = true
-#  depends_on = ["aws_internet_gateway.wiki_igw"]
-#}
+resource "aws_eip" "mw_eip_db" {
+    instance = aws_instance.dbserver.id
+  vpc      = true
+  depends_on = ["aws_internet_gateway.wiki_igw"]
+}
 
 
 resource "aws_elb" "mw_elb" {
