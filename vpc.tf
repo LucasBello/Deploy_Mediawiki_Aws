@@ -90,7 +90,7 @@ resource "aws_route_table_association" "DB_Producao_subnet" {
 #Abrir portas de aplicação
 resource "aws_security_group" "mw_sg" {
   name = "mw_sg"
-  description = "HTTP, SSH e BANCO"
+  description = "HTTP, SSH, BANCO e GRAFANA"
   vpc_id = aws_vpc.vinnland_vpc.id
 #Liberar porta 80
  ingress {
@@ -114,7 +114,6 @@ resource "aws_security_group" "mw_sg" {
     protocol = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
 
-  }
   }
 #Liberar porta 3000
   ingress {
