@@ -8,8 +8,6 @@ provider "aws" {
 #Setup da VPC
 resource "aws_vpc" "vinnland_vpc" {
   cidr_block = var.aws_cidr_vpc
-  #enable_dns_support = true #Default=true
-  #enable_dns_hostnames = true #Default=false
   tags = {
     Name = "VINAWSVPC"
   }

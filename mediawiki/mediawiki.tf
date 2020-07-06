@@ -2,6 +2,14 @@ provider "aws" {
   region = var.aws_region
 }
 
+#VPC
+resource "aws_vpc" "vinnland_vpc" {
+  cidr_block = var.aws_cidr_vpc
+  tags = {
+    Name = "VINAWSVPC"
+  }
+}
+
 #Abrir portas de aplicação
 resource "aws_security_group" "mediawiki_sg" {
   name = "mediawiki_sg"
