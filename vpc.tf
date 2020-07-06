@@ -219,7 +219,7 @@ resource "aws_instance" "webserver2" {
 }
 
 resource "aws_instance" "webserver3" {
-  ami           = var.aws_ami_RHEL
+  ami           = var.aws_ami_Ubuntu
   availability_zone = element(var.zonadisp, 0)
   instance_type = var.aws_instance_type
   key_name  = aws_key_pair.generated_key.key_name
@@ -238,7 +238,7 @@ resource "aws_instance" "webserver3" {
 }
 
 resource "aws_instance" "dbserver" {
-  ami           = var.aws_ami_ubuntu
+  ami           = var.aws_ami_RHEL
   availability_zone = element(var.zonadisp, 2)
   instance_type = var.aws_instance_type
   key_name  = aws_key_pair.generated_key.key_name 
