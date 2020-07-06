@@ -50,9 +50,12 @@ variable "keyname" {
 
 #Red Hat Enterprise Linux 8 (HVM) para região us-west-2.
 #Verificar ami para outras regiões
-variable "aws_ami" {
-  #default= "ami-098f16afa9edf40be"
+variable "aws_ami_RHEL" {
   default= "ami-28e07e50"
+}
+
+variable "aws_ami_Ubuntu" {
+  default= "ami-003634241a8fcdec0"
 }
 
 variable "aws_instance_type" {
