@@ -130,7 +130,7 @@ resource "aws_security_group" "mw_sg" {
   }
 }
 
-#Elastic Load Balancer
+#Elastic Load Balance
 resource "aws_eip" "grafana" {
     instance = aws_instance.webserver3.id
   vpc      = true
