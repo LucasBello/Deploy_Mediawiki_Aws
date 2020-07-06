@@ -138,7 +138,6 @@ resource "aws_security_group" "mw_sg" {
     cidr_blocks = ["0.0.0.0/0"]
 
   }
-  }
 #Liberar porta 3000
   ingress {
     from_port = 3000
