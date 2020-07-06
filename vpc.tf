@@ -87,29 +87,6 @@ resource "aws_route_table_association" "DB_Producao_subnet" {
     route_table_id = aws_route_table.mw_rt.id
 }
 
-#ACL - REDE INTERNA
-#resource "aws_network_acl" "webserver" {
-#  vpc_id = aws_vpc.vinnland_vpc.id
-
-#  egress {
-#    protocol = "-1"
-#    rule_no = 200
-#    action = "allow"
-#    cidr_block = "0.0.0.0/0"
-#    from_port = 0
-#    to_port = 0
-#  }
-#    ingress {
-#    protocol   = "-1"
-#    rule_no    = 100
-#    action     = "allow"
-#    cidr_block = "0.0.0.0/0"
-#    from_port  = 0
-#    to_port    = 0
-#  }
-#}
-
-
 #Abrir portas de aplicação
 resource "aws_security_group" "mw_sg" {
   name = "mw_sg"
@@ -137,6 +114,7 @@ resource "aws_security_group" "mw_sg" {
     protocol = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
 
+  }
   }
 #Liberar porta 3000
   ingress {
