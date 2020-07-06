@@ -138,6 +138,15 @@ resource "aws_security_group" "mw_sg" {
     cidr_blocks = ["0.0.0.0/0"]
 
   }
+  }
+#Liberar porta 3000
+  ingress {
+    from_port = 3000
+    to_port = 3000
+    protocol = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+
+  }
 #Saida
   egress {
     from_port       = 0
@@ -154,11 +163,17 @@ resource "aws_eip" "grafana" {
   depends_on = ["aws_internet_gateway.wiki_igw"]
 }
 
-#resource "aws_eip" "mw_eip_02" {
-#    instance = aws_instance.webserver2.id
-#  vpc      = true
-#  depends_on = ["aws_internet_gateway.wiki_igw"]
-#}
+resource "aws_eip" "mw_eip_01" {
+    instance = aws_instance.webserver1.id
+  vpc      = true
+  depends_on = ["aws_internet_gateway.wiki_igw"]
+}
+
+resource "aws_eip" "mw_eip_02" {
+    instance = aws_instance.webserver2.id
+  vpc      = true
+  depends_on = ["aws_internet_gateway.wiki_igw"]
+}
 
 resource "aws_eip" "mw_eip_db" {
     instance = aws_instance.dbserver.id
@@ -179,9 +194,6 @@ resource "aws_elb" "mw_elb" {
     lb_protocol       = "http"
   }
 }
-
-
-
 
 #Gerando Key Privada
 resource "tls_private_key" "mw_key" {
@@ -275,10 +287,22 @@ output "pem" {
         value = [tls_private_key.mw_key.private_key_pem]
 }
 
-output "address" {
+output "LoadBalance" {
   value = aws_elb.mw_elb.dns_name
 }
 
 output "Grafana" {
+  value = aws_eip.grafana.public_ip
+}
+
+output "WIKI01" {
+  value = aws_eip.mw_eip_01.public_ip
+}
+
+output "WIKI02" {
+  value = aws_eip.mw_eip_02.public_ip
+}
+
+output "DATABASE" {
   value = aws_eip.grafana.public_ip
 }
