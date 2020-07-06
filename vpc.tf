@@ -247,7 +247,7 @@ resource "aws_instance" "webserver3" {
 
   tags = {
     Name = lookup(var.aws_tags,"webserver3")
-    group = "web"
+    group = "grafana"
   }
 }
 
@@ -258,7 +258,7 @@ resource "aws_instance" "dbserver" {
   key_name  = aws_key_pair.generated_key.key_name 
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.DB_Producao_subnet.id
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   
   root_block_device {
   volume_size = 50
