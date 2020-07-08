@@ -68,8 +68,6 @@ resource "aws_route_table" "mw_rt" {
       Name = "Rota MediaWiki"
     }
 }
-
-
 resource "aws_route_table_association" "Producao_Internet" {
     subnet_id = aws_subnet.Producao_subneta.id
     route_table_id = aws_route_table.mw_rt.id
@@ -119,8 +117,25 @@ resource "aws_security_group" "mw_sg" {
     to_port = 3000
     protocol = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+  
+#Liberar porta 9100
+  ingress {
+    from_port = 9100
+    to_port = 9100
+    protocol = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+#Liberar porta 9100
+  ingress {
+    from_port = 9090
+    to_port = 9090
+    protocol = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
 
   }
+
 #Saida
   egress {
     from_port       = 0
@@ -130,7 +145,7 @@ resource "aws_security_group" "mw_sg" {
   }
 }
 
-#Elastic Load Balance
+#Elastic IP
 resource "aws_eip" "grafana" {
     instance = aws_instance.webserver3.id
   vpc      = true
@@ -149,12 +164,11 @@ resource "aws_eip" "mw_eip_02" {
   depends_on = ["aws_internet_gateway.wiki_igw"]
 }
 
-resource "aws_eip" "mw_eip_db" {
-    instance = aws_instance.dbserver.id
-  vpc      = true
-  depends_on = ["aws_internet_gateway.wiki_igw"]
-}
-
+#resource "aws_eip" "mw_eip_db" {
+#    instance = aws_instance.dbserver.id
+#  vpc      = true
+#  depends_on = ["aws_internet_gateway.wiki_igw"]
+#}
 
 resource "aws_elb" "mw_elb" {
   name = "MediaWikiELB"
@@ -187,11 +201,12 @@ resource "aws_instance" "webserver1" {
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.Producao_subneta.id 
+  private_ips = lookup(var.ip_priv,"wiki01")
   associate_public_ip_address = true
 
-  root_block_device {
-  volume_size = 50
-  }
+  #root_block_device {
+  #volume_size = 50
+  #}
 
   tags = {
     Name = lookup(var.aws_tags,"webserver1")
@@ -206,11 +221,12 @@ resource "aws_instance" "webserver2" {
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.Producao_subnetb.id
+  private_ips = lookup(var.ip_priv,"wiki02")
   associate_public_ip_address = true
 
-  root_block_device {
-  volume_size = 50
-  }
+  #root_block_device {
+  #volume_size = 50
+  #}
 
   tags = {
     Name = lookup(var.aws_tags,"webserver2")
@@ -225,11 +241,12 @@ resource "aws_instance" "webserver3" {
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.Producao_subneta.id
+  private_ips = lookup(var.ip_priv,"grafana")
   associate_public_ip_address = true
 
-  root_block_device {
-  volume_size = 50
-  }
+  #root_block_device {
+  #volume_size = 50
+  #}
 
   tags = {
     Name = lookup(var.aws_tags,"webserver3")
@@ -244,11 +261,11 @@ resource "aws_instance" "dbserver" {
   key_name  = aws_key_pair.generated_key.key_name 
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.DB_Producao_subnet.id
-  associate_public_ip_address = false
-  
-  root_block_device {
-  volume_size = 50
-  }
+  private_ips = lookup(var.ip_priv,"sql")
+    
+  #root_block_device {
+  #volume_size = 50
+  #}
 
   tags = {
     Name = lookup(var.aws_tags,"dbserver")
@@ -256,9 +273,8 @@ resource "aws_instance" "dbserver" {
   }
 }
 
-
 output "pem" {
-        value = [tls_private_key.mw_key.private_key_pem]
+  value = [tls_private_key.mw_key.private_key_pem]
 }
 
 output "LoadBalance" {
@@ -277,6 +293,6 @@ output "WIKI02" {
   value = aws_eip.mw_eip_02.public_ip
 }
 
-output "DATABASE" {
-  value = aws_eip.grafana.public_ip
-}
+#output "DATABASE" {
+#  value = aws_eip.grafana.public_ip
+#}

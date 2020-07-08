@@ -1,0 +1,14 @@
+---
+#This playbook deploys the mediawiki 
+- name: Media Wiki Database, WebServer and Grafana
+  hosts: all
+  become: yes
+  
+# Extra Vars passed from command line
+  vars_files: 
+    - vault.yml
+
+  roles:
+   - { role: mysqldb, tags: ['install_db'] }
+   - { role: web, tags: [ 'install_web' ] }
+   - { role: grafana, tags: [ 'install_grafana'] }     

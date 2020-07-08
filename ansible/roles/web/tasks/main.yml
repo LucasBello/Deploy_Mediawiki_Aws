@@ -1,0 +1,63 @@
+---
+
+- name: Add EPEL, REMI 
+  yum: 
+    name: "{{ external_repos }} "
+    state: present
+
+- name: Install package with multiple repos enabled
+  yum:
+    name: "{{ packages_web }}"
+    enablerepo: "epel,remi-safe,remi,remi-php70"
+
+- name: check php version
+  command: php -version && msql --version && httpd -version
+
+- name: start the web server
+  systemd: state=started name=httpd enabled=true
+
+- name: Download the MediaWiki Binary
+  get_url: 
+     url: 'https://releases.wikimedia.org/mediawiki/1.31/mediawiki-1.31.1.tar.gz'
+     dest: '/tmp/mediawiki-1.31.1.tar.gz'
+     mode: 0644
+
+- name: Download the Signature
+  get_url: 
+     url: 'https://releases.wikimedia.org/mediawiki/1.31/mediawiki-1.31.1.tar.gz.sig'
+     dest: '/tmp/mediawiki-1.31.1.tar.gz.sig'
+     mode: 0644
+  
+- name: Verify Signature
+  command: gpg --verify /tmp/mediawiki-1.31.1.tar.gz.sig /tmp/mediawiki-1.31.1.tar.gz
+  ignore_errors: yes
+
+- name: Extract /tmp/mediawiki-1.31.1.tar.gz  into /var/www
+  unarchive:
+    src: /tmp/mediawiki-1.31.1.tar.gz
+    dest: /var/www
+    remote_src: yes
+
+- name: create a symlink for /var/www/mediawiki-1.31.1/ to /var/www/mediawiki
+  file: 
+   src: '/var/www/mediawiki-1.31.1/'
+   dest: '/var/www/mediawiki'
+   state: link
+
+- name: Backup the httpd configuration
+  copy:
+    src: "/etc/httpd/conf/httpd.conf"
+    dest: "/etc/httpd/conf/httpd.conf_original"
+    backup: yes
+    remote_src: true
+
+- name: Customize httpd with mediawiki
+  template: 
+    src: ../templates/httpd.conf.j2
+    dest: /etc/httpd/conf/httpd.conf
+
+- name: set permissions for apache
+  command: chown -R apache:apache /var/www/mediawiki
+
+- name: restart httpd service
+  systemd: name=httpd state=restarted

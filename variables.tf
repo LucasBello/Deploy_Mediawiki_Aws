@@ -33,6 +33,17 @@ variable "aws_sg" {
   default = "sg_mediawiki"
 }
 
+#IP Privado
+variable "ip_priv"{
+  default = {
+    "wiki01"  = "10.0.1.10"
+    "grafana" = "10.0.1.11"
+    "wiki02"  = "10.0.2.20"
+    "sql"     = "10.0.3.30"
+  }
+}
+
+
 #CNAME dos servers
 variable "aws_tags" {
   default = {

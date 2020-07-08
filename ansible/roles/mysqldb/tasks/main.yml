@@ -1,0 +1,51 @@
+---
+- name: install '{{ packages}}'
+  yum: 
+   name: '{{ packages }}'
+
+- name: start the db servers
+  systemd: state=started name=mariadb
+
+- name: prepare the script to secure the databsae.
+  template: src=../templates/secure.sh.j2 dest='/tmp/secure.sh' mode=0755
+
+- name: check whether the MySQL Database is secured. 
+  stat: path='/tmp/secure_temp.log' 
+  register: secure_temp_file
+
+- name: Secure the database.
+  shell: "/tmp/secure.sh > /tmp/secure_temp.log"
+  register: secure_log
+  when: secure_temp_file.stat.exists != true
+
+###
+- name: Create a new database with name 'wikidatabase'
+  mysql_db:
+    name: "{{ db_name }}"
+    state: present
+    login_user: root
+    login_password: '{{ ROOT_PASSWORD }}'
+
+- name: Create Wiki User and provide all permissions.
+  mysql_user:
+    name: "{{ wiki_db_user }}"
+    password: "{{ WIKI_DB_PASSWORD }} "
+    host:  '%'
+    priv: '{{ db_name }}.*:ALL,GRANT'
+    state: present
+    login_user: root
+    login_password: '{{ ROOT_PASSWORD }}'
+
+
+- name: Confirmation on Creation.
+  shell: 'mysql -u root -p{{ ROOT_PASSWORD }} --execute="SHOW DATABASES;"'
+  register: db_list
+
+- name: Fail on error.
+  fail: msg="Database was not created"
+  when: db_name not in db_list.stdout_lines
+
+- name: enable service mariadb.
+  systemd:
+    name: mariadb
+    enabled: yes

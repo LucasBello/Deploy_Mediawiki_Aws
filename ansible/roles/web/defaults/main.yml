@@ -1,0 +1,30 @@
+---
+
+packages_web:
+    - httpd 
+    - php 
+    - php-mysql 
+    - php-gd 
+    - php-xml 
+    - mariadb 
+    - php-mbstring
+
+packages_web_scl:
+  - centos-release-scl
+  - httpd24-httpd 
+  - php55 
+  - php55-php 
+  - php55-php-mbstring 
+  - php55-php-mysqlnd 
+  - php55-php-gd 
+  - php55-php-xml 
+  - mariadb
+
+external_repos:
+      - http://dl.fedoraproject.org/pub/epel/7/x86_64/Packages/e/epel-release-7-12.noarch.rpm
+      - http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+
+httpd_doc_root: /var/www/mediawiki
+httpd_directory: /var/www/mediawiki
+httpd_directory_index: 'index.html index.html.var index.php'
+
