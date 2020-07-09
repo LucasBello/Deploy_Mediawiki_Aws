@@ -201,7 +201,7 @@ resource "aws_instance" "webserver1" {
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.Producao_subneta.id 
-  private_ips = lookup(var.ip_priv,"wiki01")
+  private_ip = lookup(var.ip_priv,"wiki01")
   associate_public_ip_address = true
   user_data = "${file("gobal_script.sh")}"
 
@@ -222,7 +222,7 @@ resource "aws_instance" "webserver2" {
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.Producao_subnetb.id
-  private_ips = lookup(var.ip_priv,"wiki02")
+  private_ip = lookup(var.ip_priv,"wiki02")
   associate_public_ip_address = true
   user_data = "${file("gobal_script.sh")}"
 
@@ -243,7 +243,7 @@ resource "aws_instance" "webserver3" {
   key_name  = aws_key_pair.generated_key.key_name
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.Producao_subneta.id
-  private_ips = lookup(var.ip_priv,"grafana")
+  private_ip = lookup(var.ip_priv,"grafana")
   associate_public_ip_address = true
   user_data = "${file("gobal_script.sh")}"
 
@@ -264,7 +264,7 @@ resource "aws_instance" "dbserver" {
   key_name  = aws_key_pair.generated_key.key_name 
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.DB_Producao_subnet.id
-  private_ips = lookup(var.ip_priv,"sql")
+  private_ip = lookup(var.ip_priv,"sql")
   user_data = "${file("gobal_script.sh")}"
     
   #root_block_device {
