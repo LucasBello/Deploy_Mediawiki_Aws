@@ -1,3 +1,5 @@
+sudo ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+
 sudo useradd --no-create-home --shell /bin/false prometheus
 sudo useradd --no-create-home --shell /bin/false node_exporter
 sudo mkdir /etc/prometheus
