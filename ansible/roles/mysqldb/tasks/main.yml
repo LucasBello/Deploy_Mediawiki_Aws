@@ -3,49 +3,59 @@
   yum: 
    name: '{{ packages }}'
 
-- name: start the db servers
+- name: Iniciar DB Server
   systemd: state=started name=mariadb
 
-- name: prepare the script to secure the databsae.
+- name: Script para proteger o banco de dados
   template: src=../templates/secure.sh.j2 dest='/tmp/secure.sh' mode=0755
 
-- name: check whether the MySQL Database is secured. 
+- name: Checar se banco esta protegido
   stat: path='/tmp/secure_temp.log' 
   register: secure_temp_file
 
-- name: Secure the database.
+- name: Proteger banco
   shell: "/tmp/secure.sh > /tmp/secure_temp.log"
   register: secure_log
   when: secure_temp_file.stat.exists != true
 
 ###
-- name: Create a new database with name 'wikidatabase'
+- name: Criar um novo banco 'wikidatabase'
   mysql_db:
     name: "{{ db_name }}"
     state: present
     login_user: root
     login_password: '{{ ROOT_PASSWORD }}'
 
-- name: Create Wiki User and provide all permissions.
+- name: Criar o usuario do Wiki e fornecer permissoes para host wiki01
   mysql_user:
     name: "{{ wiki_db_user }}"
-    password: "{{ WIKI_DB_PASSWORD }} "
-    host:  '%'
+    password: "123456"
+    host:  '10.0.1.10'
+    priv: '{{ db_name }}.*:ALL,GRANT'
+    state: present
+    login_user: root
+    login_password: '{{ ROOT_PASSWORD }}'
+
+- name: Criar o usuario do Wiki e fornecer permissoes para host wiki02
+  mysql_user:
+    name: "{{ wiki_db_user }}"
+    password: "123456"
+    host:  '10.0.2.20'
     priv: '{{ db_name }}.*:ALL,GRANT'
     state: present
     login_user: root
     login_password: '{{ ROOT_PASSWORD }}'
 
 
-- name: Confirmation on Creation.
+- name: Confirmacao da criacao
   shell: 'mysql -u root -p{{ ROOT_PASSWORD }} --execute="SHOW DATABASES;"'
   register: db_list
 
-- name: Fail on error.
+- name: Falha em criar
   fail: msg="Database was not created"
   when: db_name not in db_list.stdout_lines
 
-- name: enable service mariadb.
+- name: Habiltiar servico do MariaDB
   systemd:
     name: mariadb
     enabled: yes
