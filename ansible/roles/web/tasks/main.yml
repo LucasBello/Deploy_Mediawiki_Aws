@@ -62,6 +62,9 @@
 - name: restart httpd service
   systemd: name=httpd state=restarted
 
+- name: Instalar git
+  shell: yum install git -y
+
 - name: Liberar httpd reverso
   shell: sudo setsebool -P httpd_can_network_connect 1
 

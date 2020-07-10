@@ -63,6 +63,9 @@
 - name: Liberar httpd reverso
   shell: sudo setsebool -P httpd_can_network_connect 1
 
+- name: Instalar git
+  shell: yum install git -y
+
 - name: Git Clone
   shell: git clone https://github.com/LucasBello/Grafana.git
 
