@@ -89,7 +89,7 @@ After=network-online.target
 User=node_exporter
 Group=node_exporter
 Type=simple
-ExecStart=/usr/local/bin/node_exporter --collectors.enabled meminfo,loadavg,filesystem
+ExecStart=/usr/local/bin/node_exporter
 
 [Install]
 WantedBy=multi-user.target
@@ -100,12 +100,16 @@ sudo systemctl start node_exporter
 sudo systemctl enable node_exporter
 
 sudo systemctl restart prometheus
-    sudo apt-get update
-    sudo apt-get install apache2-utils
+    sudo apt-get update -y
+    sudo apt-get install apache2-utils -y
 
 sudo htpasswd -c /etc/nginx/.htpasswd lucasmoro
 sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/prometheus
 sudo nano /etc/nginx/sites-available/prometheus
+
+
+
+
 sudo rm /etc/nginx/sites-enabled/default
 sudo ln -s /etc/nginx/sites-available/prometheus /etc/nginx/sites-enabled/
 sudo nginx -t
