@@ -61,3 +61,6 @@
 
 - name: restart httpd service
   systemd: name=httpd state=restarted
+
+- name: Liberar httpd reverso
+  shell: sudo setsebool -P httpd_can_network_connect 1

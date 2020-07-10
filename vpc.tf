@@ -127,7 +127,7 @@ resource "aws_security_group" "mw_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-#Liberar porta 9100
+#Liberar porta 9090
   ingress {
     from_port = 9090
     to_port = 9090
@@ -135,6 +135,17 @@ resource "aws_security_group" "mw_sg" {
     cidr_blocks = ["0.0.0.0/0"]
 
   }
+
+#Liberar porta 9155
+  ingress {
+    from_port = 9115
+    to_port = 9115
+    protocol = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+
+  }
+
+  
 
 #Saida
   egress {
@@ -164,11 +175,11 @@ resource "aws_eip" "mw_eip_02" {
   depends_on = ["aws_internet_gateway.wiki_igw"]
 }
 
-#resource "aws_eip" "mw_eip_db" {
-#    instance = aws_instance.dbserver.id
-#  vpc      = true
-#  depends_on = ["aws_internet_gateway.wiki_igw"]
-#}
+resource "aws_eip" "mw_eip_db" {
+    instance = aws_instance.dbserver.id
+  vpc      = true
+  depends_on = ["aws_internet_gateway.wiki_igw"]
+}
 
 resource "aws_elb" "mw_elb" {
   name = "MediaWikiELB"
@@ -203,7 +214,7 @@ resource "aws_instance" "webserver1" {
   subnet_id     = aws_subnet.Producao_subneta.id 
   private_ip = lookup(var.ip_priv,"wiki01")
   associate_public_ip_address = true
-  user_data = "gobal_script.sh"
+  #user_data = "gobal_script.sh"
 
   #root_block_device {
   #volume_size = 50
@@ -224,7 +235,7 @@ resource "aws_instance" "webserver2" {
   subnet_id     = aws_subnet.Producao_subnetb.id
   private_ip = lookup(var.ip_priv,"wiki02")
   associate_public_ip_address = true
-  user_data = "gobal_script.sh"
+  #user_data = "gobal_script.sh"
 
   #root_block_device {
   #volume_size = 50
@@ -245,7 +256,7 @@ resource "aws_instance" "webserver3" {
   subnet_id     = aws_subnet.Producao_subneta.id
   private_ip = lookup(var.ip_priv,"grafana")
   associate_public_ip_address = true
-  user_data = "prometheus_script.sh"
+  #user_data = "prometheus_script.sh"
 
   #root_block_device {
   #volume_size = 50
@@ -265,7 +276,7 @@ resource "aws_instance" "dbserver" {
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.DB_Producao_subnet.id
   private_ip = lookup(var.ip_priv,"sql")
-  user_data = "gobal_script.sh"
+  #user_data = "gobal_script.sh"
     
   #root_block_device {
   #volume_size = 50
@@ -297,6 +308,6 @@ output "WIKI02" {
   value = aws_eip.mw_eip_02.public_ip
 }
 
-#output "DATABASE" {
-#  value = aws_eip.grafana.public_ip
-#}
+output "DATABASE" {
+  value = aws_eip.mw_eip_db.public_ip
+}
