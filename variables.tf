@@ -59,7 +59,7 @@ variable "keyname" {
   default = "mediawiki_key"
 }
 
-#Red Hat Enterprise Linux 8 (HVM) para região us-west-2.
+#Red Hat Enterprise Linux 7 (HVM) para região us-west-2.
 #Verificar ami para outras regiões
 variable "aws_ami_RHEL" {
   default= "ami-28e07e50"
