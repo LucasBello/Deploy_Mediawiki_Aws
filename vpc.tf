@@ -276,6 +276,7 @@ resource "aws_instance" "dbserver" {
   vpc_security_group_ids = [aws_security_group.mw_sg.id]
   subnet_id     = aws_subnet.DB_Producao_subnet.id
   private_ip = lookup(var.ip_priv,"sql")
+  associate_public_ip_address = true
   #user_data = "gobal_script.sh"
     
   #root_block_device {
