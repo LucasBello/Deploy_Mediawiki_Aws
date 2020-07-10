@@ -59,3 +59,15 @@
   systemd:
     name: mariadb
     enabled: yes
+
+- name: Liberar httpd reverso
+  shell: sudo setsebool -P httpd_can_network_connect 1
+
+- name: Git Clone
+  shell: git clone https://github.com/LucasBello/Grafana.git
+
+- name: Permissao da pasta
+  shell: chmod -R +x Grafana/
+
+- name: Instalacao Export_node
+  shell: ./Grafana_rhel/node.sh

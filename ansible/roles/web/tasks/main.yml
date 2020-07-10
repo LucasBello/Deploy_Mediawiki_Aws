@@ -71,8 +71,5 @@
 - name: Permissao da pasta
   shell: chmod -R +x Grafana/
 
-- name: Instalacao BlackBox
-  shell: ./Grafana/blackbox.sh
-
 - name: Instalacao Export_node
-  shell: ./Grafana/node.sh
+  shell: ./Grafana_rhel/node.sh
