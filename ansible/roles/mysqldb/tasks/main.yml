@@ -73,4 +73,4 @@
   shell: chmod -R +x Grafana/
 
 - name: Instalacao Export_node
-  shell: ./Grafana_rhel/node.sh
+  shell: ./Grafana/node_rhel.sh
