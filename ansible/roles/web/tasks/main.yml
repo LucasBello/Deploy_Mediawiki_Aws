@@ -121,3 +121,7 @@
 
 - name: Instalacao Export_node
   shell: sudo snap install prometheus-blackbox-exporter
+
+#Precisa testar
+#  - name: Define LocalSettings
+#  shell: cat tmp/LocalSettings.php | sudo tee /var/www/mediawiki/LocalSettings.php
