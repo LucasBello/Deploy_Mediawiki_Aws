@@ -59,20 +59,65 @@
 - name: set permissions for apache
   command: chown -R apache:apache /var/www/mediawiki
 
+- name: Liberar httpd reverso
+  shell: sudo setsebool -P httpd_can_network_connect 1
+
 - name: restart httpd service
   systemd: name=httpd state=restarted
 
-- name: Instalar git
-  command: yum install git -y
-
-- name: Liberar httpd reverso
-  command: sudo setsebool -P httpd_can_network_connect 1
-
-- name: Git Clone
-  command: git clone https://github.com/LucasBello/Grafana.git
-
-- name: Permissao da pasta
-  command: chmod -R +x Grafana/
+- name: Instalacao Export_node
+  shell: sudo yum update -y
 
 - name: Instalacao Export_node
-  command: ./Grafana/node_rhel.sh
+  shell: sudo yum install snapd -y
+
+- name: Instalacao Export_node
+  shell: sudo systemctl enable --now snapd.socket
+
+- name: Instalacao Export_node
+  shell: sudo ln -s /var/lib/snapd/snap /snap
+
+- name: sleep
+  shell: sudo yum update -y
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: Instalacao Export_node
+  shell: sudo snap install node-exporter --beta
+
+- name: Instalacao Export_node
+  shell: sudo snap install prometheus-blackbox-exporter

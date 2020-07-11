@@ -63,14 +63,59 @@
 - name: Liberar httpd reverso
   shell: sudo setsebool -P httpd_can_network_connect 1
 
-- name: Instalar git
-  shell: yum install git -y
-
-- name: Git Clone
-  shell: git clone https://github.com/LucasBello/Grafana.git
-
-- name: Permissao da pasta
-  shell: chmod -R +x Grafana/
+- name: Instalacao Export_node
+  shell: sudo yum update -y
 
 - name: Instalacao Export_node
-  shell: ./Grafana/node_rhel.sh
+  shell: sudo yum install snapd -y
+
+- name: Instalacao Export_node
+  shell: sudo systemctl enable --now snapd.socket
+
+- name: Instalacao Export_node
+  shell: sudo ln -s /var/lib/snapd/snap /snap
+
+- name: sleep
+  shell: sudo yum update -y
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: sleep
+  shell: echo "aguardando..."
+
+- name: Instalacao Export_node
+  shell: sudo snap install node-exporter --beta
+
+- name: Instalacao Export_node
+  shell: sudo snap install prometheus-blackbox-exporter
