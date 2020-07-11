@@ -1,10 +1,8 @@
 ---
-#This playbook deploys the mediawiki 
-- name: Media Wiki Database, WebServer and Grafana
+- name: Media Wiki Database, WebServer e Grafana
   hosts: all
   become: yes
   
-# Extra Vars passed from command line
   vars_files: 
     - vault.yml
 
